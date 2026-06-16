@@ -3,6 +3,7 @@ import { PORT } from './config/env.js';
 import userRouter from './routes/user.routes.js';
 import authRouter from './routes/auth.routes.js';
 import subscriptionRouter from './routes/subscription.routes.js';
+import workflowRouter from './routes/workflow.routes.js';
 import connectDB from './database/mongodb.js';
 import errorMiddleware from './middlewares/error.middleware.js';
 import cookieParser from 'cookie-parser'; // Import cookie-parser middleware
@@ -10,18 +11,21 @@ import arcjetMiddleware from './middlewares/arcjet.middleware.js'; // Import Arc
 const app = express();
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser()); // Middleware to parse cookies
 app.use(arcjetMiddleware); // Arcjet protection middleware
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/subscriptions', subscriptionRouter);
-app.use(errorMiddleware); // Error handling middleware
+app.use('/api/v1/workflows', workflowRouter);
+
+app.use(errorMiddleware); // Error handling middleware should be after all routes
+
 app.get(('/'), (req,res)=>{
     res.send('Welcome to the Subscription Tracker API!')
 });
 
-app.listen(PORT,async()=>{
+app.listen(PORT,async ()=>{
     console.log(`Running on http://localhost:${PORT}`);
     await connectDB();
 });
